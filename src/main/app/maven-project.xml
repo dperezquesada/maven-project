@@ -20,12 +20,13 @@ http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/jso
         <http:listener config-ref="HTTP_Listener_Configuration" path="/hello" allowedMethods="GET" doc:name="HTTP"/>
         <set-payload value="#['Hello Mavens']" doc:name="Set Payload"/>
     </flow>
-    <flow name="retreiveFlights">
+    <flow name="retrieveFlights">
         <http:listener config-ref="HTTP_Listener_Configuration" path="/flights" allowedMethods="GET" doc:name="HTTP"/>
         <db:select config-ref="Derby_Connection" doc:name="Database Query Flights Table">
             <db:parameterized-query><![CDATA[select * from flights]]></db:parameterized-query>
         </db:select>
         <json:object-to-json-transformer doc:name="Object to JSON"/>
+        <set-property propertyName="#['Content-Type']" value="#['application/json']" doc:name="Content-Type"/>
         <jms:outbound-endpoint queue="flights" connector-ref="Active_MQ" doc:name="JMS-Publicher"/>
     </flow>
     <flow name="logFlights">
